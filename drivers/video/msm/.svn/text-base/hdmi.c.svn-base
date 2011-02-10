@@ -1,0 +1,908 @@
+/* Copyright (c) 2008-2009, Code Aurora Forum. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of Code Aurora Forum nor
+*       the names of its contributors may be used to endorse or promote
+*       products derived from this software without specific prior written
+*       permission.
+*
+* Alternatively, provided that this notice is retained in full, this software
+* may be relicensed by the recipient under the terms of the GNU General Public
+* License version 2 ("GPL") and only version 2, in which case the provisions of
+* the GPL apply INSTEAD OF those given above.  If the recipient relicenses the
+* software under the GPL, then the identification text in the MODULE_LICENSE
+* macro must be changed to reflect "GPLv2" instead of "Dual BSD/GPL".  Once a
+* recipient changes the license terms to the GPL, subsequent recipients shall
+* not relicense under alternate licensing terms, including the BSD or dual
+* BSD/GPL terms.  In addition, the following license statement immediately
+* below and between the words START and END shall also then apply when this
+* software is relicensed under the GPL:
+*
+* START
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU General Public License version 2 and only version 2 as
+* published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+* details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program; if not, write to the Free Software Foundation, Inc.,
+* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+*
+* END
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
+#include "msm_fb.h"
+#include <mach/gpio.h>
+#include <linux/delay.h>
+#include <asm/io.h>
+#include <mach/vreg.h>
+#include <linux/miscdevice.h>
+#include <linux/ctype.h>
+#include <linux/kthread.h>
+#include <linux/proc_fs.h>
+#include "hdmi.h"
+#include "i2c_master_sw.h"
+#include "SIITPI.h"
+
+
+#define HDMI_IRQ_TRIGGER IRQF_TRIGGER_FALLING // (IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING)
+
+struct i2c_reg_conf 
+{
+    char addr;
+    char data;
+};
+
+struct i2c_reg_conf const hdmi_param_tbl[] =    //from Oscars
+{
+    {0xC7 , 0x00}, //Enable TPI
+    {0xBC , 0x01}, //Enable source termination
+    {0xBD , 0x82},
+    {0xBE , 0x25},
+    {0x1A , 0x01}, //TMDS output active and HDMI output.
+    {0x1E , 0x00}, //Power up
+    
+    //Video setting
+    {0x00 , 0x01},//PCLK,7425
+    {0x01 , 0x1D},
+    {0x02 , 0x70},//VS,6000
+    {0x03 , 0x17},
+    {0x04 , 0x72},//Htotal,1650
+    {0x05 , 0x06},
+    {0x06 , 0xEE},//Vtotal,750
+    {0x07 , 0x02},
+    
+    {0x08 , 0x70},//x1 TMDS clock/full pixel wide/rising edge/no pixel replicated
+    {0x09 , 0x00},//8bit RGB input
+    {0x0A , 0x11}, //8bit/BT709/HDMI YCBCR 444 output
+    {0x0B , 0x00}, //normal input mode
+    {0x60 , 0x00},//external sync mode
+    
+    //Audio setting
+    {0x26 , 0x80},//I2S input
+    {0x1F , 0x80},//SD0
+    {0x20 , 0x91},//MCLK,256FS
+    {0x21 , 0x00},
+    {0x22 , 0x00},
+    {0x23 , 0x00},
+    {0x24 , 0x02},//48kHz
+    {0x25 , 0x02},//16bits
+    {0x27 , 0x00},
+    
+    //AVI infoframe setting
+    {0x0C , 0x03},
+    {0x0D , 0x40},
+    {0x0E , 0x28},
+    {0x0F , 0x00},
+    {0x10 , 0x04},
+    {0x11 , 0x00},
+    {0x12 , 0x00},
+    {0x13 , 0x00},
+    {0x14 , 0x00},
+    {0x15 , 0x00},
+    {0x16 , 0x00},
+    {0x17 , 0x00},
+    {0x18 , 0x00},
+    {0x19 , 0x00},
+    
+    //Audio infoframe setting
+    {0xBF , 0xC2},
+    {0xC0 , 0x84},
+    {0xC1 , 0x01},
+    {0xC2 , 0x0A},
+    {0xC3 , 0x71},
+    {0xC4 , 0x00},
+    {0xC5 , 0x00},
+    {0xC6 , 0x00},
+    {0xC7 , 0x00},
+    {0xC8 , 0x00},
+    {0xC9 , 0x00},
+    {0xCA , 0x00},
+    {0xCB , 0x00},
+    {0xCC , 0x00},
+    {0xCD , 0x00},
+    {0x1A , 0x01}, //TMDS output active and HDMI output.
+};
+
+
+static int hdmi_on(struct platform_device *pdev);
+static int hdmi_off(struct platform_device *pdev);
+static int __init hdmi_probe(struct platform_device *pdev);
+
+
+static int hdmi_iic_probe(struct i2c_client *client,const struct i2c_device_id *id);
+static int __exit hdmi_iic_remove(struct i2c_client *client);
+
+
+struct task_struct *hdmi_task;
+struct i2c_client *hdmi_client;
+
+static int hdmi_dev_id;
+
+
+static struct platform_driver this_driver = 
+{
+    .probe  = hdmi_probe,
+    .driver = 
+    {
+        .name   = "hdmi",
+    },
+};
+
+static struct msm_fb_panel_data hdmi_data = 
+{
+    .on = hdmi_on,
+    .off = hdmi_off,
+};
+
+
+/*
+i2c controller
+*/
+static const struct i2c_device_id hdmi_id[] = 
+{
+    { "hdmi_i2c", 0},
+    { }
+};
+
+static struct i2c_driver hdmi_i2c_driver = 
+{
+    .id_table = hdmi_id,
+    .probe  = hdmi_iic_probe,
+    .remove = __exit_p(hdmi_iic_remove),
+    .driver = 
+    {
+        .name = "hdmi_i2c",
+    },
+};
+
+static int hdmi_i2c_rxdata(unsigned short saddr, struct i2c_reg_conf *reg_conf_tbl,
+                           unsigned char *rxdata, int length)
+{
+    int malloc_flag;
+    struct i2c_msg msgs[] = 
+    {
+        {   
+            .addr   = saddr,
+            .flags = 0,
+            .len   = 1,
+            .buf   = reg_conf_tbl,
+        },
+        {   
+            .addr   = saddr,
+            .flags = I2C_M_RD,
+            .len   = length,
+            .buf   = rxdata,
+        },
+    };
+    
+    if(!rxdata)
+    {
+        rxdata = (unsigned char *)kzalloc(length, GFP_KERNEL);
+        malloc_flag = 1;
+    }
+    if (i2c_transfer(hdmi_client->adapter, msgs, 2) < 0) 
+    {
+        printk(KERN_INFO "HDMI: ths8200_i2c_rxdata failed!\n");
+        return -EIO;
+    }
+#ifdef HDMI_DEBUG
+    printk(KERN_ERR "HDMI: slave %X, reg_addr %X, value %X, rd_bf_ad: 0x%X\n", saddr, reg_conf_tbl->addr, (unsigned int)(*rxdata), rxdata);
+#endif
+    if(malloc_flag)
+    {
+        kfree(rxdata);
+        rxdata = NULL;
+        malloc_flag = 0;
+    }
+    return 0;
+}
+
+static int32_t hdmi_i2c_read_conf_table(
+                                        struct i2c_reg_conf const *reg_conf_tbl, int num)
+{
+    int i;
+    int32_t rc = -EFAULT;
+#ifdef HDMI_DEBUG
+    printk(KERN_ERR "HDMI: hdmi_i2c_read_conf_table called\n");
+#endif
+    for (i = 0; i < num; i++) 
+    {
+        rc = hdmi_i2c_rxdata(hdmi_client->addr,
+            reg_conf_tbl, &reg_conf_tbl->data, 1);
+        if (rc < 0)
+        {
+            break;
+        }
+        reg_conf_tbl++;
+    }
+    
+    return rc;
+}
+
+int hdmi_i2c_txdata(unsigned short saddr, unsigned char *txdata, int length)
+{
+    struct i2c_msg msg[] = 
+    {
+        {
+            .addr  = saddr,
+            .flags = 0,
+            .len = length,
+            .buf = txdata,
+        },
+    };
+    
+    if (i2c_transfer(hdmi_client->adapter, msg, 1) < 0) 
+    {
+        printk(KERN_ERR "HDMI: hdmi_i2c_txdata failed\n");
+        return -EIO;
+    }
+    
+    return 0;
+}
+
+int hdmi_i2c_write_client_reg(unsigned short saddr, char client_reg,
+                              char bdata)
+{
+    int32_t rc = -EFAULT;
+    unsigned char buf[2];
+    
+    memset(buf, 0, sizeof(buf));
+    buf[0] = client_reg;
+    buf[1] = bdata;
+    rc = hdmi_i2c_txdata(saddr, buf, 2);
+    
+    if (rc < 0)
+    {
+        printk(KERN_ERR "HDMI: i2c_write failed, slave addr = 0x%x client reg = 0x%x, reg val =0x%x!\n",
+            saddr, client_reg, bdata);
+    }
+    
+    return rc;
+}
+
+static int32_t hdmi_i2c_write_conf_table(struct i2c_reg_conf *reg_conf_tbl, int num)
+{
+    int i;
+    int32_t rc = -EFAULT;
+    
+    for (i = 0; i < num; i++) 
+    {
+        rc = hdmi_i2c_write_client_reg(hdmi_client->addr,
+            reg_conf_tbl->addr, reg_conf_tbl->data);
+        if (rc < 0)
+        {   
+            printk(KERN_INFO "***HDMI:write break, i = %d\n", i);
+            break;
+        }
+        reg_conf_tbl++;
+    }
+    return rc;
+}
+
+
+#ifdef HDMI_DEBUG
+static int usrfs_write(struct file *file, const char __user *buf, size_t size, loff_t *ppos)
+{
+    size_t i;
+    unsigned char reg_address = 0;
+    unsigned char reg_value = 0;
+    unsigned int read_value;
+    
+    printk(KERN_INFO "HDMI: call usrfs_write\n");
+    printk(KERN_INFO "HDMI: buf string= %s\n", buf);
+    printk(KERN_INFO "HDMI: size= %d\n", size);
+    if(size)
+    {
+        for(i = 0; i != size - 1; i++) 
+        {
+            printk(KERN_INFO "HDMI: %d = %c\n", i, *(buf+i));
+        }
+        
+        if(*buf  == 'r')
+        {
+            reg_address = 0;
+            if(*(buf+1) >= 'a')
+            {
+                reg_address += (*(buf+1)  - 'a' + 10)*16;
+            }
+            else
+            {
+                reg_address += (*(buf+1)  - '0')*16;
+            }
+            
+            if(*(buf+2) >= 'a')
+            {
+                reg_address += *(buf+2)  - 'a' + 10;
+            }
+            else
+            {
+                reg_address += *(buf+2)  - '0';
+            }
+            
+            read_value = I2C_ReadByte(hdmi_client->addr, reg_address);
+            printk(KERN_INFO "HDMI: **h00163450:read Reg0x%x = 0x%x\n", reg_address, read_value);
+        }
+        else if(*buf  == 'p')
+        {
+            // print all register info
+            hdmi_i2c_read_conf_table(hdmi_param_tbl, ARRAY_SIZE(hdmi_param_tbl));
+        }
+        else
+        {
+            if(*(buf) >= 'a')
+            {
+                reg_address += (*(buf)  - 'a' + 10)*16;
+            }
+            else
+            {
+                reg_address += (*(buf)  - '0')*16;
+            }
+            
+            if(*(buf+1) >= 'a')
+            {
+                reg_address += *(buf+1)  - 'a' + 10;
+            }
+            else
+            {
+                reg_address += *(buf+1)  - '0';
+            }
+            
+            if(*(buf+3) >= 'a')
+            {
+                reg_value += (*(buf+3) - 'a' + 10)*16;
+            }
+            else
+            {
+                reg_value += (*(buf+3) - '0')*16;
+            }
+            
+            if(*(buf+4) >= 'a')
+            {
+                reg_value += *(buf+4) - 'a' + 10;
+            }
+            else
+            {
+                reg_value += *(buf+4) - '0';
+            }
+            
+            printk(KERN_INFO "HDMI: address = 0x%x, value = 0x%x\n", reg_address, reg_value);
+            
+            
+            I2C_WriteByte(hdmi_client->addr, reg_address, reg_value);
+            
+            read_value = I2C_ReadByte(hdmi_client->addr, reg_address);
+            printk(KERN_INFO "HDMI:hdmi addr = %d\n",hdmi_client->addr);
+            printk(KERN_INFO "HDMI: **h00163450:read Reg0x%x = 0x%x\n", reg_address, read_value);
+        }
+    }
+    return size;
+}
+
+static int usrfs_open(struct inode *inode, struct file *file)
+{
+    printk(KERN_INFO "call usrfs_open\n");
+    return 0;
+}
+
+static const struct file_operations usrfs_fops = 
+{
+	.owner = THIS_MODULE,
+	.write = usrfs_write,
+	.open = usrfs_open,
+};
+
+static struct miscdevice usrfs_device = 
+{
+    .minor = MISC_DYNAMIC_MINOR,
+    .name = "usrfs_misc",  //under /dev/usrfs_misc
+    .fops = &usrfs_fops,
+};
+#endif //HDMI_DEBUG
+
+static int hdmi_on(struct platform_device *pdev)
+{
+    hdmi_startup();
+	return 0;
+}
+
+static int hdmi_off(struct platform_device *pdev)
+{
+    return 0;
+}
+
+static int __init hdmi_probe(struct platform_device *pdev)
+{
+#ifdef HDMI_DEBUG
+    printk(KERN_INFO "HDMI: hdmi_probe\n");
+#endif
+    msm_fb_add_device(pdev);
+    
+    return 0;
+}
+
+#if 0 // ISR handling
+static irqreturn_t hdmi_irq_handler(int irq, void *dev_id)
+{
+    int data;
+    printk(KERN_INFO "HDMI: IRQ is called\n");
+    
+    
+    data = gpio_read_detect_status(160);
+    printk(KERN_INFO " HYQ: [hdmi.c] read gpio 160 status = %d", data);
+    //disable_irq(lis3xx_client_pdata->gpioirq1);
+    //schedule_work(&lis3xx_work1);
+    //enable_irq(lis3xx_client_pdata->gpioirq1);
+}
+#endif
+
+static int hdmi_iic_probe(struct i2c_client *client,
+                          const struct i2c_device_id *id)
+{
+    int rc = 0;
+#if 0 // ISR handling
+    int ret;
+#endif
+    
+    if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) 
+    {
+        printk(KERN_INFO "HDMI: i2c_check_functionality failed\n");
+        goto probe_failure;
+    }
+#ifdef HDMI_DEBUG
+    printk(KERN_INFO "HYQ: [hdmi.c] call hdmi_iic_probe!!\n");
+#endif
+    hdmi_client = client;
+    
+    
+#if 0 // ISR handling
+    /* register IRQ */
+    ret = request_irq(gpio_to_irq(160),  // is it right?
+        hdmi_irq_handler,
+        HDMI_IRQ_TRIGGER,
+        "HDMI",
+        NULL);
+    if (ret) 
+    {
+        printk(KERN_ERR "Unable to get HDMI IRQ %d (%d)\n",
+            gpio_to_irq(160), ret);
+        
+    }
+#endif
+    return 0;
+    
+probe_failure:
+    printk(KERN_ERR "HDMI: hdmi_iic_probe failed! rc = %d\n", rc);
+    return rc;
+}
+
+static int __exit hdmi_iic_remove(struct i2c_client *client)
+{
+    hdmi_client = NULL;
+    return 0;
+}
+
+static char hdmi_is_cable_connected(void)
+{
+    char cablePlugStatus = 0x00;
+
+	cablePlugStatus = I2C_ReadByte(hdmi_client->addr, 0x3d);
+
+#if 0 //C01 产品暂不做处理
+	if(cablePlugStatus & 0x08)
+	{
+	    return 1;  // cable is connected
+	}
+	else
+	{
+	   return 0;  // cable is not connected
+	}
+#else
+	return 0;
+#endif
+}
+
+void hdmi_change_dss_drive_strength(void)
+{
+    int gpio_idx;
+    unsigned int gpio_strengthen;
+    for(gpio_idx = 111; gpio_idx < 139; gpio_idx++) 
+    {
+        gpio_strengthen = GPIO_CFG(gpio_idx, 1, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_12MA);
+        gpio_tlmm_config(gpio_strengthen, GPIO_ENABLE);
+    }
+}
+
+/* hdmi proc file concerned */
+struct proc_dir_entry *hdmi_dir;
+
+static int hdmi_read_proc_status(char *page, char **start, off_t offset,
+                                 int count, int *eof, void *data)
+{
+    unsigned int status;
+    *eof = 1;
+    
+#ifdef HDMI_DEBUG
+    printk(KERN_INFO "call hdmi_read_proc_status!\n");
+#endif
+
+    status = hdmi_is_cable_connected();
+
+    return sprintf(page, "%u\n", status);
+}
+
+static int hdmi_write_proc_status(struct file *file, const char *buffer,
+                                  unsigned long count, void *data)
+{
+    char status;
+#ifdef HDMI_DEBUG
+    printk(KERN_INFO "call hdmi_write_proc_status!\n");
+#endif
+    
+    
+    if (count < 1)
+    {
+        return -EINVAL;
+    }
+    
+    if (copy_from_user(&status, buffer, 1))
+    {
+        return -EFAULT;
+    }
+    
+    if (status == '0')
+    {
+        ;
+    }
+    else
+    {
+        ;
+    }
+    
+    /* claim that we wrote everything */
+    return count;
+}
+
+int hdmi_create_proc_file(void)
+{
+    int retval;
+    struct proc_dir_entry *ent;
+    
+    hdmi_dir = proc_mkdir("hdmi", NULL);
+    if (hdmi_dir == NULL) 
+    {
+#ifdef HDMI_DEBUG
+        printk(KERN_ERR "Unable to create /proc/hdmi directory");
+#endif
+        return -ENOMEM;
+    }
+    
+    /* Creating read/write "status" entry */
+    ent = create_proc_entry("status", 0644, hdmi_dir);
+    if (ent == NULL) 
+    {
+        printk(KERN_ERR "Unable to create /proc/hdmi/status entry");
+        retval = -ENOMEM;
+        goto fail;
+    }
+    ent->read_proc = hdmi_read_proc_status;
+    ent->write_proc = hdmi_write_proc_status;
+    return 0;
+fail:
+    remove_proc_entry("status", hdmi_dir);
+    return 0;
+}
+EXPORT_SYMBOL(hdmi_create_proc_file);
+
+/*
+	返回值有:
+		0   HDMI cable未插入
+		1   HDMI cable插入
+*/
+int hdmi_get_plug_status(void)
+{
+	return hdmi_is_cable_connected();
+}
+EXPORT_SYMBOL(hdmi_get_plug_status);
+
+#ifdef HUAWEI_HW_SUPPORT_VERSION_C
+static int hdmi_power(int on)
+{
+	struct vreg *vreg_mmc; 
+	struct vreg *vreg_msme2; 
+	int ret;
+
+	/* 1.8 V */
+    vreg_mmc = vreg_get(NULL, "mmc");
+    if (IS_ERR(vreg_mmc)) 
+    {
+        printk(KERN_ERR "HDMI: %s: vreg_get gp1 failed (%ld)\n",
+            __func__, PTR_ERR(vreg_mmc));
+        return -EIO;
+    }
+    ret = vreg_set_level(vreg_mmc, 1800);
+    if (ret) 
+    {
+        printk(KERN_ERR "HDMI: %s: vreg gp1 set level failed (%d)\n",
+            __func__, ret);
+        return -EIO;
+    }
+    
+	/* 1.2 V */
+    vreg_msme2 = vreg_get(NULL, "msme2");
+    if (IS_ERR(vreg_msme2)) 
+    {
+        printk(KERN_ERR "HDMI: %s: vreg_get gp1 failed (%ld)\n",
+            __func__, PTR_ERR(vreg_msme2));
+        return -EIO;
+    }
+    ret = vreg_set_level(vreg_msme2, 1200);
+    if (ret) 
+    {
+        printk(KERN_ERR "HDMI: %s: vreg gp1 set level failed (%d)\n",
+            __func__, ret);
+        return -EIO;
+    }
+
+	if (on)
+	{
+		ret = vreg_enable(vreg_mmc);
+	    if (ret)
+	    {
+	        printk(KERN_ERR "HDMI: vreg enable failed");
+	        return -EIO;
+	    }
+
+		
+	    ret = vreg_enable(vreg_msme2);
+	    if (ret)
+	    {
+	        printk(KERN_ERR "HDMI: vreg enable failed");
+	        return -EIO;
+	    }
+	}
+	else
+	{
+		vreg_disable(vreg_msme2);
+		vreg_disable(vreg_mmc);
+	}
+
+	return 0;
+}
+
+#elif defined HUAWEI_HW_SUPPORT_VERSION_B
+static int hdmi_power(int on)
+{
+	struct vreg *vreg_gp1; 
+	struct vreg *vreg_wlan;
+	unsigned int gpio_vdd12;
+	unsigned int gpio_index = 10;
+	int ret;
+
+	vreg_gp1 = vreg_get(NULL, "gp1");
+	
+    if (IS_ERR(vreg_gp1)) 
+    {
+        printk(KERN_ERR "HDMI: %s: vreg_get gp1 failed (%ld)\n",
+            __func__, PTR_ERR(vreg_gp1));
+        return -EIO;
+    }
+    ret = vreg_set_level(vreg_gp1, 2850);
+    if (ret) 
+    {
+        printk(KERN_ERR "HDMI: %s: vreg gp1 set level failed (%d)\n",
+            __func__, ret);
+        return -EIO;
+    }
+
+	ret = vreg_enable(vreg_gp1);
+    if (ret)
+    {
+        printk(KERN_ERR "HDMI: vreg enable failed");
+        return -EIO;
+    }
+	
+	gpio_vdd12 = GPIO_CFG(gpio_index, 0, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_2MA);
+    gpio_tlmm_config(gpio_vdd12, GPIO_ENABLE);
+    gpio_direction_output(gpio_index, 0);
+    msleep_interruptible(100);
+    
+    vreg_wlan = vreg_get(NULL, "wlan");
+    if (IS_ERR(vreg_wlan)) 
+    {
+        printk(KERN_ERR "HDMI: %s: vreg_get wlan failed (%ld)\n",
+            __func__, PTR_ERR(vreg_wlan));
+        return -EIO;
+    }
+    ret = vreg_set_level(vreg_wlan, 1800);
+    if (ret) 
+    {
+        printk(KERN_ERR "HDMI: %s: vreg wlan set level failed (%d)\n",
+            __func__, ret);
+        return -EIO;
+    }
+
+	if (on)
+	{
+	    gpio_direction_output(gpio_index, 1);
+	    
+	    ret = vreg_enable(vreg_wlan);
+	    if (ret)
+	    {
+	        printk(KERN_ERR "HDMI: vreg enable failed");
+	        return -EIO;
+	    }
+	}
+	else
+	{
+		vreg_disable(vreg_wlan);
+		gpio_direction_output(gpio_index, 0);
+	}
+	return 0;
+}
+#else
+static int hdmi_power(int on)
+{
+	return 0;
+}
+#endif
+
+
+void hdmi_standby(void)
+{
+	TPI_Power_Standby();
+}
+
+int hdmi_startup(void)
+{
+    unsigned int gpio_159 = 159;
+
+	hdmi_power(1);  // power on
+	
+#ifdef HDMI_DEBUG
+    printk(KERN_ERR "HDMI: reset hdmi chip\n");
+#endif
+
+	/* reset HDMI IC */
+    gpio_159 = GPIO_CFG(159, 0, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_2MA);
+    gpio_tlmm_config(gpio_159, GPIO_ENABLE);
+    gpio_direction_output(159, 0);
+    msleep_interruptible(10);
+    gpio_direction_output(159, 1);
+    msleep_interruptible(5);
+    
+    /* init the HDMI register  */
+    //hdmi_i2c_write_conf_table(hdmi_param_tbl, ARRAY_SIZE(hdmi_param_tbl));
+#ifdef HDMI_DEBUG
+    hdmi_i2c_read_conf_table(hdmi_param_tbl, ARRAY_SIZE(hdmi_param_tbl));
+#endif
+    if(FALSE == TPI_Init())
+    {
+        printk(KERN_ERR "HDMI IC is absent!\n");
+		
+		return -1;
+    }
+    TPI_Poll();  
+    
+    return 0;
+}
+EXPORT_SYMBOL(hdmi_startup);
+
+int hdmi_shutdown(void)
+{
+	int ret; 
+	
+	ret = hdmi_power(0);
+
+	return ret;
+}
+EXPORT_SYMBOL(hdmi_shutdown);
+
+
+int hdmi_device_register(struct msm_panel_info *pinfo)
+{
+    struct platform_device *pdev = NULL;
+    int ret;
+    
+    pdev = platform_device_alloc("hdmi", ++hdmi_dev_id);
+    if (!pdev)
+    {
+        return -ENOMEM;
+    }
+    
+    hdmi_data.panel_info = *pinfo;
+    ret = platform_device_add_data(pdev, &hdmi_data,
+        sizeof(hdmi_data));
+    if (ret) 
+    {
+        printk(KERN_ERR
+            "HDMI: %s: platform_device_add_data failed!\n", __func__);
+        goto err_device_put;
+    }
+    
+    ret = platform_device_add(pdev);
+    if (ret) 
+    {
+        printk(KERN_ERR
+            "HDMI: %s: platform_device_register failed!\n", __func__);
+        goto err_device_put;
+    }
+    
+    return 0;
+    
+err_device_put:
+    platform_device_put(pdev);
+    return ret;
+}
+EXPORT_SYMBOL(hdmi_device_register);
+
+static int __init hdmi_init(void)
+{
+    int32_t rc = 0;
+    rc = i2c_add_driver(&hdmi_i2c_driver);
+    
+#ifdef HDMI_DEBUG
+    printk(KERN_INFO "HDMI: call function hdmi_init\n");
+#endif
+    
+    if (IS_ERR_VALUE(rc))
+        printk(KERN_ERR "HDMI: register i2c driver failed\n");
+    
+#ifdef HDMI_DEBUG
+    rc = misc_register(&usrfs_device); 
+    if(rc)
+    {
+        printk(KERN_ERR "HDMI: can't register misc device for minor %d\n", usrfs_device.minor);
+        misc_deregister(&usrfs_device);
+    }
+#endif
+    
+    return platform_driver_register(&this_driver);
+}
+
+module_init(hdmi_init);
+

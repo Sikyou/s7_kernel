@@ -1,0 +1,533 @@
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm
+END
+lcdc_innolux_panel.c
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_innolux_panel.c
+END
+SIIAV_Config.c
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/3431/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIIAV_Config.c
+END
+mdp4_debugfs.c
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp4_debugfs.c
+END
+mdp4_overlay.c
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp4_overlay.c
+END
+lcdc_toshiba_wvga_pt.c
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_toshiba_wvga_pt.c
+END
+SIIAV_Config.h
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIIAV_Config.h
+END
+lcdc_gordon.c
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_gordon.c
+END
+mdp.c
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp.c
+END
+hdmi.c
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/TC_HID_CODE_SVN/!svn/ver/3431/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/hdmi.c
+END
+mdp4_overlay_dtv.c
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/TC_HID_CODE_SVN/!svn/ver/1760/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp4_overlay_dtv.c
+END
+mdp.h
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp.h
+END
+tv_pal.c
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/tv_pal.c
+END
+hdmi.h
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/TC_HID_CODE_SVN/!svn/ver/3431/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/hdmi.h
+END
+msm_fb_def.h
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/msm_fb_def.h
+END
+mddi_prism.c
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_prism.c
+END
+mdp_ppp_v31.c
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_ppp_v31.c
+END
+lcdc_sharp_wvga_pt.c
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_sharp_wvga_pt.c
+END
+SerialPort.h
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SerialPort.h
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/Makefile
+END
+mdp_ppp.c
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_ppp.c
+END
+mdp_dma.c
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_dma.c
+END
+mdp_hw_init.c
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_hw_init.c
+END
+lcdc.c
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc.c
+END
+Externals.h
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/Externals.h
+END
+mdp_dma_tv.c
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_dma_tv.c
+END
+mddihost.c
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddihost.c
+END
+mddi_toshiba_wvga_pt.c
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_toshiba_wvga_pt.c
+END
+lcdc_backlight.c
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_backlight.c
+END
+mdp_cursor.c
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_cursor.c
+END
+tvenc.c
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/tvenc.c
+END
+mddihost.h
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddihost.h
+END
+msm_fb_bl.c
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/msm_fb_bl.c
+END
+SIITPI_Access.c
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIITPI_Access.c
+END
+mddi_toshiba_vga.c
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_toshiba_vga.c
+END
+lcdc_panel.c
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_panel.c
+END
+ebi2_l2f.c
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/ebi2_l2f.c
+END
+tvenc.h
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/tvenc.h
+END
+SIITPI_Access.h
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIITPI_Access.h
+END
+ebi2_tmd20.c
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/ebi2_tmd20.c
+END
+mdp4_overlay_lcdc.c
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp4_overlay_lcdc.c
+END
+SIITypeDefs.h
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIITypeDefs.h
+END
+Kconfig
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/Kconfig
+END
+ebi2_lcd.c
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/ebi2_lcd.c
+END
+msm_fb.c
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/msm_fb.c
+END
+msm_fb.h
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/msm_fb.h
+END
+mddi_toshiba_wvga.c
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_toshiba_wvga.c
+END
+mddi.c
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi.c
+END
+mddi_orise.c
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1760/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_orise.c
+END
+mddihost_e.c
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddihost_e.c
+END
+msm_fb_panel.c
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/msm_fb_panel.c
+END
+Globals.c
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/Globals.c
+END
+mdp_dma_s.c
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_dma_s.c
+END
+mddihosti.c
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddihosti.c
+END
+mddi_toshiba.c
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_toshiba.c
+END
+SIIConstants.h
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIIConstants.h
+END
+mdp_dma_lcdc.c
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_dma_lcdc.c
+END
+msm_fb_panel.h
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/msm_fb_panel.h
+END
+mddihosti.h
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddihosti.h
+END
+mddi_toshiba.h
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_toshiba.h
+END
+mddi_ext.c
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_ext.c
+END
+SIIMacros.h
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIIMacros.h
+END
+logo.c
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/logo.c
+END
+SIITPI.c
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/TC_HID_CODE_SVN/!svn/ver/3431/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIITPI.c
+END
+i2c_master_sw.c
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/i2c_master_sw.c
+END
+mdp4_util.c
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp4_util.c
+END
+hdmi_sii9022.c
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/hdmi_sii9022.c
+END
+mdp4_overlay_mddi.c
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/TC_HID_CODE_SVN/!svn/ver/1753/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp4_overlay_mddi.c
+END
+mdp_vsync.c
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_vsync.c
+END
+SIITPI.h
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/TC_HID_CODE_SVN/!svn/ver/3431/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIITPI.h
+END
+i2c_master_sw.h
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/i2c_master_sw.h
+END
+lcdc_external.c
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_external.c
+END
+mdp4.h
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/TC_HID_CODE_SVN/!svn/ver/6027/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp4.h
+END
+mddi_sharp.c
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_sharp.c
+END
+SIIEDID.c
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIIEDID.c
+END
+mddi_ext_lcd.c
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mddi_ext_lcd.c
+END
+lcdc_prism.c
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/TC_HID_CODE_SVN/!svn/ver/3967/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_prism.c
+END
+SIIEDID.h
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIIEDID.h
+END
+SIISiI9022A72.c
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/TC_HID_CODE_SVN/!svn/ver/3431/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIISiI9022A72.c
+END
+tv_ntsc.c
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/TC_HID_CODE_SVN/!svn/ver/2855/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/tv_ntsc.c
+END
+mdp4_dtv.c
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/TC_HID_CODE_SVN/!svn/ver/1760/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp4_dtv.c
+END
+SIITPI_Regs.h
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIITPI_Regs.h
+END
+mdp_ppp_v20.c
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/mdp_ppp_v20.c
+END
+SIIVideoModeTable.c
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIIVideoModeTable.c
+END
+adv7520.c
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/TC_HID_CODE_SVN/!svn/ver/1760/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/adv7520.c
+END
+lcdc_wxga.c
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/TC_HID_CODE_SVN/!svn/ver/1131/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_wxga.c
+END
+lcdc_panel-s70.c
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/TC_HID_CODE_SVN/!svn/ver/4611/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/lcdc_panel-s70.c
+END
+SIIdefs.h
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/TC_HID_CODE_SVN/!svn/ver/3431/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIIdefs.h
+END
+SIIVideoModeTable.h
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/TC_HID_CODE_SVN/!svn/ver/1961/trunk/S70_ECLAIR/APPS/android/kernel/drivers/video/msm/SIIVideoModeTable.h
+END

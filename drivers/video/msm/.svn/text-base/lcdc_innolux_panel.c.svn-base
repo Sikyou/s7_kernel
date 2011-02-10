@@ -1,0 +1,214 @@
+/* Copyright (c) 2008-2009, Code Aurora Forum. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of Code Aurora Forum nor
+ *       the names of its contributors may be used to endorse or promote
+ *       products derived from this software without specific prior written
+ *       permission.
+ *
+ * Alternatively, provided that this notice is retained in full, this software
+ * may be relicensed by the recipient under the terms of the GNU General Public
+ * License version 2 ("GPL") and only version 2, in which case the provisions of
+ * the GPL apply INSTEAD OF those given above.  If the recipient relicenses the
+ * software under the GPL, then the identification text in the MODULE_LICENSE
+ * macro must be changed to reflect "GPLv2" instead of "Dual BSD/GPL".  Once a
+ * recipient changes the license terms to the GPL, subsequent recipients shall
+ * not relicense under alternate licensing terms, including the BSD or dual
+ * BSD/GPL terms.  In addition, the following license statement immediately
+ * below and between the words START and END shall also then apply when this
+ * software is relicensed under the GPL:
+ *
+ * START
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License version 2 and only version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ * END
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
+#include "msm_fb.h"
+//c00106211 add for gpio setting
+#include <mach/gpio.h>
+#include <mach/io.h>
+#include <linux/delay.h>
+#include <linux/clk.h>
+#include <mach/vreg.h>
+#include "../../../arch/arm/mach-msm/proc_comm.h"
+
+#define TLMMADDR_TLMM_BASE	0xA8E00000
+#define TLMMADDR_GPIO1_BASE     0xA8E00000
+#define TLMMADDR_GPIO2_BASE	0xA8F00400
+#define TLMMADDR_GPIO1SHDW1_BASE     0xA9000800
+#define TLMMADDR_GPIO2SHDW1_BASE     0xA9100C00
+//#define TLMMADDR_GPIO1SHDW1_BASE     0xA9000000
+//#define TLMMADDR_GPIO2SHDW1_BASE     0xA9100000
+#define TLMMADDR_GPIO1SHDW2_BASE     0xA9201000
+#define TLMMADDR_GPIO2SHDW2_BASE     0xA9301400
+//end add
+
+//#define outpdw(port, val) (*((volatile unsigned long *) (port)) = ((unsigned long) (val)))
+//#define inpdw(port,val) ((unsigned long) (val)) = *((unsigned long *) (port))
+
+struct vreg {
+        const char *name;
+        unsigned id;
+        int status;
+};
+static int lcdc_panel_on(struct platform_device *pdev)
+{
+    unsigned int gpio = 0;
+    int reg_status = 0;
+    unsigned int virt_addr = 0;
+    gpio = GPIO_CFG(60, 2, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_2MA);
+    gpio_tlmm_config(gpio, GPIO_ENABLE);
+
+#if 1
+    virt_addr = (unsigned int)ioremap(TLMMADDR_GPIO1SHDW1_BASE, 0x100);
+    reg_status = inpdw(virt_addr + 0x0004);
+    outpdw(virt_addr + 0x0004, reg_status | 1<<17);
+    //      virt_addr = (unsigned int)ioremap(TLMMADDR_GPIO1SHDW1_BASE + 0x0024, 0x4);
+    reg_status = inpdw(virt_addr + 0x0024);
+    outpdw(virt_addr + 0x0024, reg_status | 1<<17);
+    outpdw(virt_addr + 0x0044, 1<<3|1<<1|1);//CFG
+
+    virt_addr = (unsigned int)ioremap(0xa8600000, 0x100);
+    reg_status = inpdw(virt_addr + 0x0150);
+    printk(KERN_INFO "innolinux TCXO_NS_REG = %d\n", reg_status);
+    //        virt_addr = (unsigned int)ioremap(0xA8600000, 1024);
+    reg_status = inpdw(virt_addr);
+    outpdw(virt_addr, reg_status | 1<<14);
+    outpdw(virt_addr + 0x0054, 0x1069F);
+    outpdw(virt_addr + 0x0058, 0xD400BF8);
+#if 0    
+    virt_addr = (unsigned int)ioremap(0xA9D00000, 0x100);
+    outpdw(virt_addr + 0x4C, 1);
+    outpdw(virt_addr + 0x50, (0x1FFF - (4800 -1)));
+    outpdw(virt_addr + 0x54, 2400);
+#endif
+#endif
+	return 0;
+}
+
+static int lcdc_panel_off(struct platform_device *pdev)
+{
+	unsigned int gpio = 0;
+
+	gpio = GPIO_CFG(60, 2, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_2MA);
+	gpio_tlmm_config(gpio, GPIO_DISABLE);
+
+	printk(KERN_INFO "***************lcdc_panel_off*******************\n");
+	return 0;
+}
+
+static void lcdc_panel_set_backlight(struct msm_fb_data_type *mfd)
+{
+    return;
+}
+static int __init lcdc_panel_probe(struct platform_device *pdev)
+{
+    msm_fb_add_device(pdev);
+    return 0;
+}
+
+static struct platform_driver this_driver = {
+	.probe  = lcdc_panel_probe,
+	.driver = {
+		.name   = "lcdc_panel",
+	},
+};
+
+static struct msm_fb_panel_data lcdc_panel_data = {
+	.on = lcdc_panel_on,
+	.off = lcdc_panel_off,
+	.set_backlight = lcdc_panel_set_backlight,
+};
+
+static int lcdc_dev_id;
+
+int lcdc_device_register(struct msm_panel_info *pinfo)
+{
+	struct platform_device *pdev = NULL;
+	int ret;
+	unsigned gpio;
+
+	pdev = platform_device_alloc("lcdc_panel", ++lcdc_dev_id);
+	if (!pdev)
+		return -ENOMEM;
+
+	lcdc_panel_data.panel_info = *pinfo;
+	ret = platform_device_add_data(pdev, &lcdc_panel_data,
+		sizeof(lcdc_panel_data));
+	if (ret) {
+		printk(KERN_ERR
+		  "%s: platform_device_add_data failed!\n", __func__);
+		goto err_device_put;
+	}
+
+	ret = platform_device_add(pdev);
+	if (ret) {
+		printk(KERN_ERR
+		  "%s: platform_device_register failed!\n", __func__);
+		goto err_device_put;
+	}
+	
+	
+/*First time we light lcd & backlight here.So lcdc_panel_on may call GPIO 60 enable again*/	
+    gpio = GPIO_CFG(60, 2, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_2MA);
+    gpio_tlmm_config(gpio, GPIO_ENABLE);
+   
+    gpio_direction_output(29, 1);
+    mdelay(30);
+    gpio_set_value(29,1);
+    mdelay(30);
+    printk("\n regist lcdc.\n");
+    
+    return 0;
+
+err_device_put:
+	platform_device_put(pdev);
+	return ret;
+}
+
+static int __init lcdc_panel_init(void)
+{
+//added by c00106211 20090731, register a i2c driver for hdmi
+#if 0
+	int32_t rc = 0;
+	rc = i2c_add_driver(&mt9p012_driver);
+	if (IS_ERR_VALUE(rc))
+	printk(KERN_ERR "hdmi register i2c driver failed\n");;
+#endif
+//end add
+	return platform_driver_register(&this_driver);
+}
+
+module_init(lcdc_panel_init);

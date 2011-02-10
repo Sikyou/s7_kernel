@@ -1,0 +1,7 @@
+
+config MSM_FB_RGB565
+	tristate "MSM FB RGB565"
+	depends on MACH_QSD8X50_SURF_S7_S7200
+	default n
+	help
+	  MSM/QSD FB controller.

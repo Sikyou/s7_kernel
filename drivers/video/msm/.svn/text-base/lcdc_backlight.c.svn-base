@@ -1,0 +1,284 @@
+/* Copyright (c) 2008-2009, Huawei LCD backlight control for truly
+add by l63336
+GPL
+ */
+
+#include "msm_fb.h"
+#include <mach/gpio.h>
+#include <mach/io.h>
+#include <linux/delay.h>
+#include <linux/clk.h>
+#include <mach/vreg.h>
+#include "../../../arch/arm/mach-msm/proc_comm.h"
+
+#define TLMMADDR_TLMM_BASE	0xA8E00000
+#define TLMMADDR_GPIO1_BASE     0xA8E00000
+#define TLMMADDR_GPIO2_BASE	0xA8F00400
+#define TLMMADDR_GPIO1SHDW1_BASE     0xA9000800
+#define TLMMADDR_GPIO2SHDW1_BASE     0xA9100C00
+//#define TLMMADDR_GPIO1SHDW1_BASE     0xA9000000
+//#define TLMMADDR_GPIO2SHDW1_BASE     0xA9100000
+#define TLMMADDR_GPIO1SHDW2_BASE     0xA9201000
+#define TLMMADDR_GPIO2SHDW2_BASE     0xA9301400
+
+#define GP_MN_N 4800
+
+#define LCDC_BACKLIGHTKRNL_CRTL 1
+
+#ifdef LCDC_BACKLIGHTKRNL_CRTL
+atomic_t g_atBacklight = ATOMIC_INIT(0);
+#endif
+
+/*linux kernel Max level is 8*/
+
+#define GP_MN_MAX_LEVEL 8
+
+struct vreg {
+        const char *name;
+        unsigned id;
+        int status;
+};
+
+struct semaphore lcd_backlight_mutex;
+
+/*
+Backlight level : 0~8
+0: Max dark.(shut down backlight)
+8: Max brightness.
+
+User PROC just set 0~7.
+8: Max light is reserved
+*/
+static int g_siBacklightlevel = 0;
+
+void lcdc_setbacklight(int level)
+{
+    unsigned int virt_addr = 0;
+#ifdef LCDC_BACKLIGHTKRNL_CRTL
+    if(atomic_read(&g_atBacklight))
+    {
+//        printk("\n lcdc_setbackligt lcd not ready.\n");
+        g_siBacklightlevel = level;
+        return;
+    }
+#endif    
+    if (level >= GP_MN_MAX_LEVEL)
+    {
+        level = GP_MN_MAX_LEVEL;
+    }
+    else if( level < 0)
+    {
+        level = 0;
+    }
+    
+// TODO:
+    else
+    {/*do nothing*/
+        ;
+    }
+  
+    printk("\n =!!!====== %d,level :%d\n",__LINE__,level);    
+
+    down(&lcd_backlight_mutex);
+#if 0       
+    gpio = GPIO_CFG(60, 2, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_2MA);
+    gpio_tlmm_config(gpio, GPIO_ENABLE);
+
+    virt_addr = (unsigned int)ioremap(TLMMADDR_GPIO1SHDW1_BASE, 0x100);
+    reg_status = inpdw(virt_addr + 0x0004);
+    outpdw(virt_addr + 0x0004, reg_status | 1<<17);
+    reg_status = inpdw(virt_addr + 0x0024);
+    outpdw(virt_addr + 0x0024, reg_status | 1<<17);
+    outpdw(virt_addr + 0x0044, 1<<3|1<<1|1);//CFG
+
+/*Chose clk*/
+/*enable pbus_clk*/
+    virt_addr = (unsigned int)ioremap(0xa8600000, 0x100);
+    reg_status = inpdw(virt_addr + 0x0150);
+
+    printk(KERN_INFO "???TCXO_NS_REG = %d\n", reg_status);
+    reg_status = inpdw(virt_addr);
+    outpdw(virt_addr, reg_status | 1<<14);
+    outpdw(virt_addr + 0x0054, 0x1069F);
+    outpdw(virt_addr + 0x0058, 0xD400BF8);
+#endif
+
+    virt_addr = (unsigned int)ioremap(0xA9D00000, 0x100);
+
+    outpdw(virt_addr + 0x4C, 1);//M
+    outpdw(virt_addr + 0x50, (0x1FFF - (GP_MN_N-1)));// N
+    
+    /*
+    0:   Shut down backlight.
+    8:   Max light.
+    */
+    outpdw(virt_addr + 0x54, (GP_MN_MAX_LEVEL - level)*(GP_MN_N/GP_MN_MAX_LEVEL));//DUTY
+    up(&lcd_backlight_mutex);
+
+    return;
+}
+
+EXPORT_SYMBOL(lcdc_setbacklight);
+
+#ifdef CONFIG_HAS_EARLYSUSPEND
+static struct early_suspend lcdc_backlight_suspend;
+
+void lcdc_reseum_setbacklight(int level)
+{
+    unsigned int virt_addr = 0;
+    
+//    unsigned int reg_status;
+//    unsigned int gpio;
+    
+    down(&lcd_backlight_mutex);
+#if 0   
+    gpio = GPIO_CFG(60, 2, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_2MA);
+    gpio_tlmm_config(gpio, GPIO_ENABLE);
+    
+    virt_addr = (unsigned int)ioremap(TLMMADDR_GPIO1SHDW1_BASE, 0x100);
+    reg_status = inpdw(virt_addr + 0x0004);
+    outpdw(virt_addr + 0x0004, reg_status | 1<<17);
+    reg_status = inpdw(virt_addr + 0x0024);
+    outpdw(virt_addr + 0x0024, reg_status | 1<<17);
+    outpdw(virt_addr + 0x0044, 1<<3|1<<1|1);//CFG
+
+/*Chose clk*/
+/*enable pbus_clk*/
+    virt_addr = (unsigned int)ioremap(0xa8600000, 0x100);
+    reg_status = inpdw(virt_addr + 0x0150);
+
+    printk(KERN_INFO "???TCXO_NS_REG = %d\n", reg_status);
+    reg_status = inpdw(virt_addr);
+    outpdw(virt_addr, reg_status | 1<<14);
+    outpdw(virt_addr + 0x0054, 0x1069F);
+    outpdw(virt_addr + 0x0058, 0xD400BF8);
+#endif
+    virt_addr = (unsigned int)ioremap(0xA9D00000, 0x100);
+
+    outpdw(virt_addr + 0x4C, 1);//M
+    outpdw(virt_addr + 0x50, (0x1FFF - (GP_MN_N-1)));// N
+    
+    /*
+    0:   Shut down backlight.
+    8:   Max light.
+    */
+    outpdw(virt_addr + 0x54, (GP_MN_MAX_LEVEL - level)*(GP_MN_N/GP_MN_MAX_LEVEL));//DUTY
+    up(&lcd_backlight_mutex);
+
+    return;
+}
+EXPORT_SYMBOL(lcdc_reseum_setbacklight);
+
+static void lcdbacklight_late_resume(struct early_suspend *h)
+{
+/*We add sem to avoid Double in set*/
+/*Wait lcd on*/
+//    mdelay(00);
+#if 0
+   unsigned gpio;
+    printk("lcdc_late_resume %d\n", __LINE__);
+    
+//    if(!gpio_get_value(29))
+//    if(iFirsttime)
+//    {
+    printk("\nGPIO 29 not set. We set gpio 29. \n");
+    if(gpio_direction_output(29, 1) < 0)
+    {
+        printk("\n lcd gpio 29 set error.\n");
+        return;
+    }
+    
+    gpio_set_value(29,1);
+//    msleep_interruptible(40);
+    mdelay(40);
+
+    if (gpio_direction_output(151, 1) < 0)
+    {
+        printk("\n lcd gpio 151 set error.\n");
+        return;        
+    }
+    printk("\n ************** %d Value:%d\n",__LINE__,gpio_get_value(151));
+    gpio_set_value(151,1);
+    mdelay(40);
+
+ 
+    printk("\n ************** %d Value:%d\n",__LINE__,gpio_get_value(151));
+//    msleep_interruptible(2);
+    printk("\nGPIO 60 not set. We set gpio 60. \n");
+    gpio = GPIO_CFG(60, 2, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_2MA);
+    gpio_tlmm_config(gpio, GPIO_ENABLE);
+    mdelay(50);
+#endif
+
+#ifdef LCDC_BACKLIGHTKRNL_CRTL
+    printk("\n lcdbacklight_late_resume \n");
+    gpio_direction_output(29, 1);
+    mdelay(30);
+    gpio_set_value(29,1);
+    mdelay(30);
+   
+    lcdc_reseum_setbacklight(g_siBacklightlevel);
+    atomic_set(&g_atBacklight,0);
+#endif
+
+    return;
+}
+static void lcdcbacklight_early_suspend(struct early_suspend *h)
+{
+#if 0
+
+  unsigned gpio;
+
+//    msleep_interruptible(40);
+//    mdelay(40);
+    gpio = GPIO_CFG(60, 2, GPIO_OUTPUT, GPIO_NO_PULL, GPIO_2MA);
+    gpio_tlmm_config(gpio, GPIO_DISABLE);
+    mdelay(40);
+
+    if (gpio_direction_output(151, 1) < 0)
+    {
+        printk("\n lcd gpio 151 set error.\n");
+        return;
+    }
+    gpio_set_value(151,1);
+    mdelay(20);
+
+    if(gpio_direction_output(29, 1) < 0)
+    {
+        printk("\n lcdc_panel_off gpio 29 set error. \n");
+        return;
+    }
+    gpio_set_value(29,0);
+//    msleep_interruptible(2);
+    mdelay(40);
+#endif
+    printk("\n lcdcbacklight_early_suspend \n");
+
+#ifdef LCDC_BACKLIGHTKRNL_CRTL
+    lcdc_reseum_setbacklight(0);
+    
+    gpio_direction_output(29, 1);
+    mdelay(30);
+    gpio_set_value(29,0);
+    mdelay(30);
+
+    atomic_set(&g_atBacklight,1);
+    g_siBacklightlevel = 0;
+#endif
+    return;
+}
+
+static int __init lcdc_backlight_init(void)
+{
+
+    init_MUTEX(&lcd_backlight_mutex);
+    
+    lcdc_backlight_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN;
+    lcdc_backlight_suspend.resume = lcdbacklight_late_resume;
+    lcdc_backlight_suspend.suspend = lcdcbacklight_early_suspend;
+    register_early_suspend(&lcdc_backlight_suspend);
+    return 0;
+}
+module_init(lcdc_backlight_init);
+#endif
+
